@@ -2,6 +2,7 @@ package controller
 
 import (
 	"dictService/midllewares"
+	"dictService/models"
 	"github.com/gin-gonic/gin"
 )
 
@@ -12,21 +13,29 @@ type WordController struct {
 //
 //	在词典中查询单词
 func (WordController) GetWordDetail(c *gin.Context) {
-	success := false
 	params, _ := c.Get("params")
 	parameters := params.(midllewares.Params)
-	if parameters.QueryParams["word"] == "" {
-		returnResult(c, false, nil)
+	wordStr := parameters.QueryParams["word"]
+	if wordStr == "" {
+		returnResult(c, false, nil, "单词不能为空！")
 		return
 	}
 
-	result := map[string]interface{}{
-		"word": parameters.QueryParams["word"],
-		"dict": parameters.QueryParams["dict"],
-	}
-	if result != nil {
-		success = true
+	dictId := DefaultDictId
+	// 若传入词典, 则验证词典有效性
+	searchedDict := parameters.QueryParams["dict"]
+	if (DictController{}.ExistDictId(searchedDict)) {
+		dictId = searchedDict
 	}
 
-	returnResult(c, success, result)
+	word := models.Word{
+		DictId: dictId,
+	}
+	result := models.DB.Table(dictId).Where("word = ?", wordStr).First(&word)
+
+	if result.Error == nil {
+		returnResult(c, true, word, "查询成功！")
+	} else {
+		returnResult(c, false, nil, "查询成功！")
+	}
 }

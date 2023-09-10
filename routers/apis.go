@@ -21,6 +21,7 @@ func StartServer() {
 	admin.RouterInit(router)
 	DictRoutersInit(router)
 	WordRoutersInit(router)
+	WordBookRoutersInit(router)
 
 	registerRouter()
 
