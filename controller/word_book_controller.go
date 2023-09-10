@@ -3,6 +3,7 @@ package controller
 import (
 	"dictService/midllewares"
 	"dictService/models"
+	"encoding/json"
 	"github.com/gin-gonic/gin"
 	"strconv"
 )
@@ -130,14 +131,6 @@ func (WordBookController) Edit(c *gin.Context) {
 	}
 }
 
-type WordBookData struct {
-	Id         uint
-	UserId     int
-	WordId     int
-	WordBookId int
-	Word       string
-}
-
 // GetWordList
 //
 //	在词书中查询单词
@@ -169,4 +162,67 @@ func (WordBookController) GetWordList(c *gin.Context) {
 		`).Scan(&list)
 
 	returnResult(c, true, list)
+}
+
+type ReqParam struct {
+	UserId int      `json:"user_id"`
+	BookId int      `json:"book_id"`
+	Words  []string `json:"words"`
+}
+
+// AddWordList
+// 添加单词到词书
+func (con WordBookController) AddWordList(c *gin.Context) {
+	var req ReqParam
+	err := json.NewDecoder(c.Request.Body).Decode(&req)
+	if err != nil {
+		returnResult(c, false, nil, err.Error())
+		return
+	}
+
+	err1 := con.addWordsToWordBooks(req.UserId, req.BookId, req.Words)
+	if err1 == nil {
+		returnResult(c, true, len(req.Words))
+	} else {
+		returnResult(c, false, nil)
+	}
+}
+
+// 查询单词对应的 word_id
+func (WordBookController) findWordIDs(words []string) ([]uint, error) {
+	var results []models.Word
+	if err := models.DB.Model(&models.Word{}).Select("id").Where("word IN (?)", words).Find(&results).Error; err != nil {
+		return nil, err
+	}
+
+	var wordIDs []uint
+	for _, result := range results {
+		wordIDs = append(wordIDs, result.Id)
+	}
+
+	return wordIDs, nil
+}
+
+// 向 word_books 表中添加单词
+func (con WordBookController) addWordsToWordBooks(userId int, wordBookId int, words []string) error {
+	wordIDs, err := con.findWordIDs(words)
+	if err != nil {
+		return err
+	}
+
+	var wordBookData []models.WordBookData
+	for _, wordID := range wordIDs {
+		wordBook := models.WordBookData{
+			WordId:     wordID,
+			UserId:     userId,
+			WordBookId: wordBookId,
+		}
+		wordBookData = append(wordBookData, wordBook)
+	}
+
+	if err := models.DB.Model(&models.WordBookData{}).Create(&wordBookData).Error; err != nil {
+		return err
+	}
+
+	return nil
 }

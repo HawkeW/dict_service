@@ -15,6 +15,7 @@ func WordBookRoutersInit(r *gin.Engine) {
 		wordRouters.GET("/create", controller.WordBookController{}.Creat)
 		wordRouters.GET("/update", controller.WordBookController{}.Edit)
 		wordRouters.GET("/delete", controller.WordBookController{}.Delete)
+		wordRouters.POST("/add_words", controller.WordBookController{}.AddWordList)
 
 	}
 }
