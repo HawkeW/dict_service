@@ -1,4 +1,4 @@
-package server
+package midllewares
 
 import (
 	"fmt"
@@ -10,7 +10,7 @@ type Params struct {
 	PostParams  map[string]string
 }
 
-func logParamsMiddleware() gin.HandlerFunc {
+func LogParamsMiddleware() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		params := Params{
 			QueryParams: make(map[string]string),
@@ -19,7 +19,9 @@ func logParamsMiddleware() gin.HandlerFunc {
 
 		// 读取GET参数
 		for key, values := range c.Request.URL.Query() {
-			params.QueryParams[key] = values[0]
+			if values[0] != "" {
+				params.QueryParams[key] = values[0]
+			}
 		}
 
 		// 读取POST参数

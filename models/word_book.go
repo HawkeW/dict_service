@@ -1,16 +1,12 @@
 package models
 
-import (
-	"time"
-)
-
 type WordBook struct {
-	Id          uint
-	UserId      int
-	Type        int
-	Name        string
-	Description string
-	CreatedAt   time.Time
-	UpdatedAt   time.Time
-	Deleted     time.Time
+	Id          uint   `json:"id"`
+	UserId      int    `json:"user_id"`
+	Type        int    `json:"type"`
+	Name        string `json:"name"`
+	Description string `json:"description"`
+	CreatedAt   string `json:"created_at"`
+	UpdatedAt   string `json:"updated_at"`
+	DeletedAt   string `json:"deleted_at"`
 }

@@ -1,7 +1,8 @@
-package server
+package routers
 
 import (
-	"dictService/controller"
+	"dictService/midllewares"
+	"dictService/routers/admin"
 	"fmt"
 	"github.com/gin-gonic/gin"
 )
@@ -14,22 +15,26 @@ func StartServer() {
 	router = gin.Default()
 
 	// 参数读取中间件
-	router.Use(logParamsMiddleware())
+	router.Use(midllewares.LogParamsMiddleware())
+
+	// 分组路由注册
+	admin.RouterInit(router)
+	DictRoutersInit(router)
+	WordRoutersInit(router)
 
 	registerRouter()
 
 	// 启动HTTP服务器并监听8080端口
 	err := router.Run(":8080")
 	if err != nil {
-		fmt.Println("福娃五启动失败")
+		fmt.Println("服务启动失败")
 		return
 	}
 }
 
 // 定义接口映射
 var routers = map[string]gin.HandlerFunc{
-	"/":                HandleHome,
-	"/get_word_detail": GetWordDetail,
+	"/": HandleHome,
 }
 
 func registerRouter() {
@@ -44,16 +49,4 @@ func HandleHome(context *gin.Context) {
 	if err != nil {
 		fmt.Println("Success")
 	}
-}
-
-func GetWordDetail(c *gin.Context) {
-	params, _ := c.Get("params")
-	parameters := params.(Params)
-
-	result := controller.GetWordDetail(map[string]interface{}{
-		"id":   parameters.QueryParams["id"],
-		"dict": parameters.QueryParams["dict"],
-	})
-
-	c.JSON(200, result)
 }

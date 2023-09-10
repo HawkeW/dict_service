@@ -1,7 +1,7 @@
 package main
 
-import "dictService/server"
+import "dictService/routers"
 
 func main() {
-	server.StartServer()
+	routers.StartServer()
 }

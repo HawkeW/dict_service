@@ -1,10 +1,10 @@
 package models
 
 type Word struct {
-	Id       uint
-	Word     string
-	DictId   string
-	PronUk   string
-	PronUs   string
-	Captions string
+	Id       uint   `json:"id"`
+	Word     string `json:"word"`
+	DictId   string `json:"dict_id"`
+	PronUk   string `json:"pron_uk"`
+	PronUs   string `json:"pron_us"`
+	Captions string `json:"captions"`
 }
