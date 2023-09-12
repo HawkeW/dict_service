@@ -22,6 +22,7 @@ func StartServer() {
 	DictRoutersInit(router)
 	WordRoutersInit(router)
 	WordBookRoutersInit(router)
+	UserRoutersInit(router)
 
 	registerRouter()
 

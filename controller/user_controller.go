@@ -114,3 +114,17 @@ func (con UserController) DeleteById(c *gin.Context) {
 		returnResult(c, false, nil, "未找到用户！")
 	}
 }
+
+// Login
+// 用户登录
+func (con UserController) Login(c *gin.Context) {
+	phone := c.Request.Form.Get("phone")
+	password := c.Request.Form.Get("password")
+	var user models.User
+	models.DB.Clauses(clause.Returning{}).Where("phone = ?", phone).Where("password = ?", password).First(&user)
+	if user.Id > 0 {
+		returnResult(c, true, user, "成功！")
+	} else {
+		returnResult(c, false, nil, "失败！")
+	}
+}
