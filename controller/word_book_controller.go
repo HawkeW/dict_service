@@ -150,6 +150,7 @@ func (WordBookController) GetWordList(c *gin.Context) {
 	bookResult.Raw(`
 		SELECT
 			Book.word_id,
+			WordBase.word,
 			Dict.link_word_id,
 			Dict.word,
 			Dict.pron_uk,
@@ -157,8 +158,8 @@ func (WordBookController) GetWordList(c *gin.Context) {
 			Dict.captions
 		FROM
 			word_book_data AS Book
-		INNER JOIN
-   			colins_cn AS Dict ON Book.word_id = Dict.link_word_id;
+		JOIN words AS WordBase ON Book.word_id = WordBase.id
+		JOIN colins_cn AS Dict ON WordBase.word = Dict.word;
 		`).Scan(&list)
 
 	returnResult(c, true, list)
