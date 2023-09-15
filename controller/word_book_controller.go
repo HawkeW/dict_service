@@ -78,6 +78,28 @@ func (WordBookController) Creat(c *gin.Context) {
 	}
 }
 
+// DeleteList
+// 用户删除词书数组
+func (WordBookController) DeleteList(c *gin.Context) {
+	type reqParam struct {
+		Ids    []int `json:"ids"`
+		UserId int   `json:"user_id"`
+	}
+	var req reqParam
+	err := json.NewDecoder(c.Request.Body).Decode(&req)
+
+	if err != nil {
+		returnResult(c, false, nil, "参数错误")
+		return
+	}
+	result := models.DB.Where("user_id = ?", req.UserId).Delete(&models.WordBook{}, req.Ids)
+	if result.Error == nil && result.RowsAffected > 0 {
+		returnResult(c, true, nil)
+	} else {
+		returnResult(c, false, nil)
+	}
+}
+
 // Delete
 // 用户删除词书
 func (WordBookController) Delete(c *gin.Context) {
