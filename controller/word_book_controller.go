@@ -4,6 +4,7 @@ import (
 	"dictService/midllewares"
 	"dictService/models"
 	"encoding/json"
+	"fmt"
 	"github.com/gin-gonic/gin"
 	"strconv"
 )
@@ -166,13 +167,10 @@ func (WordBookController) GetWordList(c *gin.Context) {
 	}
 
 	// 词书数据
-	bookResult := models.DB.Table("word_book_data").Where("word_book_id = ?", wordBookId)
-
 	var list []models.Word
-	bookResult.Raw(`
+	searchSql := fmt.Sprintf(`
 		SELECT
 			Book.word_id,
-			WordBase.word,
 			Dict.link_word_id,
 			Dict.word,
 			Dict.pron_uk,
@@ -180,16 +178,21 @@ func (WordBookController) GetWordList(c *gin.Context) {
 			Dict.captions
 		FROM
 			word_book_data AS Book
-		JOIN words AS WordBase ON Book.word_id = WordBase.id
-		JOIN colins_cn AS Dict ON WordBase.word = Dict.word;
-		`).Scan(&list)
+		JOIN 
+			words AS WordBase ON Book.word_id = WordBase.id
+		JOIN 
+			colins_cn AS Dict ON WordBase.word = Dict.word
+		WHERE 
+			Book.word_book_id = %d;
+		`, wordBookId)
+	models.DB.Table("word_book_data").Raw(searchSql).Scan(&list)
 
 	returnResult(c, true, list)
 }
 
 type ReqParam struct {
 	UserId int      `json:"user_id"`
-	BookId int      `json:"book_id"`
+	BookId int      `json:"word_book_id"`
 	Words  []string `json:"words"`
 }
 
