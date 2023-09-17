@@ -1,0 +1,5 @@
+sqlite:
+  path: /Users/hawkewang/Downloads/word_database.db
+
+http:
+  port: 8080

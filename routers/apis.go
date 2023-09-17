@@ -1,6 +1,7 @@
 package routers
 
 import (
+	"dictService/global"
 	"dictService/midllewares"
 	"dictService/routers/admin"
 	"fmt"
@@ -26,8 +27,8 @@ func StartServer() {
 
 	registerRouter()
 
-	// 启动HTTP服务器并监听8080端口
-	err := router.Run(":8080")
+	// 启动HTTP服务器并监听http.port端口
+	err := router.Run(":" + global.Global.Config.Http.Port)
 	if err != nil {
 		fmt.Println("服务启动失败")
 		return
