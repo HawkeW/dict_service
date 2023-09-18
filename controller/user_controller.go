@@ -3,6 +3,7 @@ package controller
 import (
 	"dictService/midllewares"
 	"dictService/models"
+	"encoding/json"
 	"github.com/gin-gonic/gin"
 	"gorm.io/gorm/clause"
 	"strconv"
@@ -118,10 +119,13 @@ func (con UserController) DeleteById(c *gin.Context) {
 // Login
 // 用户登录
 func (con UserController) Login(c *gin.Context) {
-	phone := c.Request.Form.Get("phone")
-	password := c.Request.Form.Get("password")
 	var user models.User
-	models.DB.Clauses(clause.Returning{}).Where("phone = ?", phone).Where("password = ?", password).First(&user)
+	err := json.NewDecoder(c.Request.Body).Decode(&user)
+	if err != nil {
+		returnResult(c, false, nil, err.Error())
+		return
+	}
+	models.DB.Clauses(clause.Returning{}).Where("phone = ?", user.Phone).Where("password = ?", user.Password).First(&user)
 	if user.Id > 0 {
 		returnResult(c, true, user, "成功！")
 	} else {

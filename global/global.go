@@ -19,11 +19,11 @@ type Http struct {
 	Port string `yaml:"port"`
 }
 
-type GlobalOpt struct {
+type Opt struct {
 	Config *Config
 }
 
-var Global = GlobalOpt{}
+var Global = Opt{}
 
 func InitConfig() {
 	yamlFile, err := os.ReadFile("config.yaml")
